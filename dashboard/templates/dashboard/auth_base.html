@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Authentication{% endblock %}</title>
+    <style>
+        body {
+            background: #f0f2f5;
+            font-family: 'Poppins', sans-serif;
+            padding: 50px;
+        }
+        .auth-box {
+            max-width: 400px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-box">
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>

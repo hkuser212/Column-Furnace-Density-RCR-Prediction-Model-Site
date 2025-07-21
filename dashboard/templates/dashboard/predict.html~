@@ -1,0 +1,223 @@
+{% extends 'dashboard/base.html' %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    /* [same CSS you already have — left unchanged for style consistency] */
+    body {
+        background: linear-gradient(135deg, #1d3557, #457b9d, #a8dadc);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+    }
+
+    @keyframes gradientBG {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .predict-container {
+        max-width: 850px;
+        margin: 50px auto;
+        background: rgba(255, 255, 255, 0.93);
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+
+    h2 {
+        text-align: center;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 30px;
+    }
+
+    form label {
+        display: block;
+        font-weight: 600;
+        margin-top: 20px;
+        margin-bottom: 8px;
+        color: #1d3557;
+    }
+
+    input[type="number"] {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1.8px solid #ccc;
+        font-size: 15px;
+        transition: border 0.3s ease;
+    }
+
+    input[type="number"]:focus {
+        border-color: #4895ef;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(72, 149, 239, 0.15);
+    }
+
+    .form-check {
+        margin: 20px 0;
+        font-weight: 500;
+    }
+
+    .form-check input {
+        margin-right: 8px;
+    }
+
+    button {
+        background: linear-gradient(to right, #4361ee, #3f37c9);
+        color: white;
+        padding: 14px 25px;
+        border: none;
+        font-weight: 600;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 1rem;
+        display: block;
+        margin: 25px auto 0;
+        transition: background 0.3s ease, transform 0.2s;
+    }
+
+    button:hover {
+        background: linear-gradient(to right, #3f37c9, #4895ef);
+        transform: translateY(-2px);
+    }
+
+    .result, .charts {
+        margin-top: 40px;
+        text-align: center;
+    }
+
+    .result h3 {
+        font-size: 1.4rem;
+        margin-bottom: 10px;
+        color: #222;
+    }
+
+    .profit-value {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #2c7da0;
+        margin-bottom: 20px;
+    }
+
+    canvas {
+        max-width: 700px;
+        margin-top: 20px;
+    }
+</style>
+
+<div class="predict-container">
+    <h2><i class="fas fa-fire"></i> DCU Furnace Output Predictor</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit"><i class="fas fa-magic"></i> Predict</button>
+    </form>
+
+    {% if result %}
+    <div class="result">
+        <h3>📊 Predicted Outputs</h3>
+        <div class="profit-value">Estimated Profit: ₹{{ profit|floatformat:2 }}</div>
+    </div>
+
+    <div class="charts">
+        <canvas id="predictedChart"></canvas>
+    </div>
+    {% endif %}
+
+    {% if compare_chart %}
+    <div class="charts">
+        <h3>📈 Actual vs Predicted</h3>
+        <canvas id="comparisonChart"></canvas>
+    </div>
+    {% endif %}
+</div>
+{% if result %}
+    {{ result|json_script:"predicted-data" }}
+    {{ labels|json_script:"chart-labels" }}
+{% endif %}
+
+{% if actual %}
+    {{ actual|json_script:"actual-data" }}
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    {% if result %}
+    const labels = JSON.parse(document.getElementById('chart-labels').textContent);
+    const predicted = JSON.parse(document.getElementById('predicted-data').textContent);
+
+    const ctxPred = document.getElementById('predictedChart')?.getContext('2d');
+    if (ctxPred && predicted.length > 0) {
+        new Chart(ctxPred, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Predicted',
+                    data: predicted,
+                    backgroundColor: '#3f88c5',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Predicted Output',
+                        font: { size: 18 }
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+    {% endif %}
+
+    {% if actual %}
+    const actual = JSON.parse(document.getElementById('actual-data').textContent);
+    const ctxCompare = document.getElementById('comparisonChart')?.getContext('2d');
+    if (ctxCompare) {
+        new Chart(ctxCompare, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Actual',
+                        data: actual,
+                        backgroundColor: '#adb5bd',
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'Predicted',
+                        data: predicted,
+                        backgroundColor: '#ffb703',
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Actual vs Predicted',
+                        font: { size: 18 }
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+    {% endif %}
+</script>

@@ -1,0 +1,347 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+<style>
+    :root {
+        --primary: #4361ee;
+        --secondary: #3f37c9;
+        --accent: #4895ef;
+        --light: #f8f9fa;
+        --dark: #212529;
+        --success: #4cc9f0;
+        --error: #f72585;
+    }
+
+    .register-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
+        overflow: hidden;
+
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        padding: 40px;
+        width: 100%;
+        max-width: 500px;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .glass-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+        z-index: -1;
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 30px;
+        color: white;
+    }
+
+    .form-header h2 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .form-header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-top: 5px;
+    }
+
+    .input-group {
+        position: relative;
+        margin-bottom: 25px;
+    }
+
+    .input-group label {
+        position: absolute;
+        top: 50%;
+        left: 15px;
+        transform: translateY(-50%);
+        color: rgba(255,255,255,0.7);
+        font-size: 1rem;
+        pointer-events: none;
+        transition: all 0.3s ease;
+    }
+
+    .input-group input {
+        width: 100%;
+        padding: 16px 15px 16px 50px;
+        border: none;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        font-size: 1rem;
+        color: white;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .input-group input:focus,
+    .input-group input:valid {
+        background: rgba(255, 255, 255, 0.25);
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(255,255,255,0.3);
+    }
+
+    .input-group input:focus + label,
+    .input-group input:valid + label {
+        top: 0;
+        left: 15px;
+        font-size: 0.8rem;
+        background: rgba(67, 97, 238, 0.8);
+        padding: 2px 8px;
+        border-radius: 50px;
+        color: white;
+        transform: translateY(0);
+    }
+
+    .input-group i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: rgba(255,255,255,0.7);
+        transition: all 0.3s ease;
+    }
+
+    .input-group input:focus ~ i,
+    .input-group input:valid ~ i {
+        color: white;
+    }
+
+    .submit-btn {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        border: none;
+        padding: 16px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.4s ease;
+        width: 100%;
+        letter-spacing: 1px;
+        margin-top: 10px;
+        box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .submit-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: 0.5s;
+    }
+
+    .submit-btn:hover::before {
+        left: 100%;
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(67, 97, 238, 0.6);
+    }
+
+    .submit-btn:active {
+        transform: translateY(0);
+    }
+
+    .errorlist {
+        color: var(--error);
+        font-size: 0.9rem;
+        margin: 5px 0 10px;
+        list-style-type: none;
+        padding-left: 0;
+        background: rgba(247, 37, 133, 0.15);
+        padding: 10px;
+        border-radius: 8px;
+        border-left: 3px solid var(--error);
+        animation: fadeIn 0.3s ease;
+    }
+
+    .form-footer {
+        text-align: center;
+        margin-top: 25px;
+        color: rgba(255,255,255,0.8);
+        font-size: 0.95rem;
+    }
+
+    .form-footer a {
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .form-footer a::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: white;
+        transition: width 0.3s ease;
+    }
+
+    .form-footer a:hover::after {
+        width: 100%;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .floating {
+        animation: floating 8s ease-in-out infinite;
+    }
+
+    @keyframes floating {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-15px); }
+        100% { transform: translateY(0px); }
+    }
+</style>
+
+<div class="register-container">
+    <div class="glass-card">
+        <div class="form-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" class="bi bi-person-plus floating" viewBox="0 0 16 16" style="color: white; margin-bottom: 15px;">
+                <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z"/>
+            </svg>
+            <h2>Create Your Account</h2>
+            <p>Join our community and unlock exclusive features</p>
+        </div>
+
+        <!-- Display non-field errors -->
+        {% if form.non_field_errors %}
+            <ul class="errorlist">
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="input-group">
+                <i class="bi bi-person"></i>
+                <input type="text" id="id_username" name="username" required>
+                <label for="id_username">Username</label>
+                {% if form.username.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.username.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div class="input-group">
+                <i class="bi bi-envelope"></i>
+                <input type="email" id="id_email" name="email" required>
+                <label for="id_email">Email Address</label>
+                {% if form.email.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.email.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div class="input-group">
+                <i class="bi bi-lock"></i>
+                <input type="password" id="id_password1" name="password1" required>
+                <label for="id_password1">Password</label>
+                {% if form.password1.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.password1.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div class="input-group">
+                <i class="bi bi-shield-lock"></i>
+                <input type="password" id="id_password2" name="password2" required>
+                <label for="id_password2">Confirm Password</label>
+                {% if form.password2.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.password2.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="submit-btn">Create Account</button>
+
+            <div class="form-footer">
+                <p>Already have an account? <a href="#">Sign In</a></p>
+                <p>By registering, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Add floating labels functionality
+    document.querySelectorAll('.input-group input').forEach(input => {
+        // Set initial state based on existing value
+        if(input.value) {
+            input.nextElementSibling.style.top = '0';
+            input.nextElementSibling.style.fontSize = '0.8rem';
+            input.nextElementSibling.style.background = 'rgba(67, 97, 238, 0.8)';
+            input.nextElementSibling.style.padding = '2px 8px';
+            input.nextElementSibling.style.borderRadius = '50px';
+            input.nextElementSibling.style.color = 'white';
+            input.nextElementSibling.style.transform = 'translateY(0)';
+        }
+
+        // Add focus effect for password fields
+        if(input.type === 'password') {
+            input.addEventListener('focus', () => {
+                input.setAttribute('data-focused', 'true');
+            });
+
+            input.addEventListener('blur', () => {
+                if(!input.value) {
+                    input.removeAttribute('data-focused');
+                }
+            });
+        }
+    });
+</script>
+
+{% endblock %}

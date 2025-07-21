@@ -1,0 +1,43 @@
+{% extends 'dashboard/base.html' %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1>Industrial Furnace Dashboard</h1>
+    <p>Monitor and analyze your industrial furnace operations with real-time data and predictive analytics. Optimize performance and reduce energy consumption.</p>
+</div>
+
+<div class="dashboard-cards">
+    <div class="card">
+        <div class="card-header">
+            <h2>Performance Metrics</h2>
+        </div>
+        <div class="card-body">
+            <h3>Real-time Monitoring</h3>
+            <p>Track temperature, pressure, and efficiency metrics in real-time with our advanced monitoring system.</p>
+            <a href="{% url 'predict' %}" class="card-btn">View Dashboard</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>Predictive Analysis</h2>
+        </div>
+        <div class="card-body">
+            <h3>Forecast Efficiency</h3>
+            <p>Our AI-powered models predict furnace performance and identify potential issues before they occur.</p>
+            <a href="{% url 'predict' %}" class="card-btn">Run Analysis</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>Energy Optimization</h2>
+        </div>
+        <div class="card-body">
+            <h3>Reduce Consumption</h3>
+            <p>Discover opportunities to minimize energy usage while maintaining optimal operating conditions.</p>
+            <a href="#" class="card-btn">Optimize Now</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

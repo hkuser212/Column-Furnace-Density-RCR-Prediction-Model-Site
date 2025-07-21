@@ -1,0 +1,23 @@
+from django import forms
+from .utils import get_input_features, df,get_default_values
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
+
+input_features = get_input_features()
+
+
+class PredictionForm(forms.Form):
+    autofill = forms.BooleanField(required=False, label="Use Example Values 1")
+    autofill2 = forms.BooleanField(required=False, label="Use Example Values 2")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for feature in input_features:
+            mean_val = float(df[feature].mean()) if feature in df.columns else 0.0
+            self.fields[feature] = forms.FloatField(label=feature, initial=mean_val)
+class RegisterForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password1', 'password2']
